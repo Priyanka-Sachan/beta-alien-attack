@@ -104,15 +104,18 @@ def get_number_aliens_x(settings,alien_width):
     return number_aliens_x
 
 def get_number_aliens_y(settings,ship_height,alien_height):
-    available_space_y=settings.screen_height-(3*alien_height)-ship_height
+    available_space_y=settings.screen_height-(2*alien_height)-ship_height
     number_aliens_y=int(available_space_y/(2*alien_height))
     return number_aliens_y
 
 def create_alien(screen,settings,aliens,alien_number_x,alien_number_y):
     alien=Alien(screen,settings)
+    alien.rect.y=alien.rect.height+1.5*alien.rect.height*alien_number_y
     alien.rect.x=alien.rect.width+2*alien.rect.width*alien_number_x
     alien.x=alien.rect.x
-    alien.rect.y=alien.rect.height+2*alien.rect.height*alien_number_y
+    if alien_number_y%2:
+        alien.rect.x+=alien.rect.width
+        alien.x=alien.rect.x
     aliens.add(alien)
 
 def create_fleet(screen,settings,ship,aliens):

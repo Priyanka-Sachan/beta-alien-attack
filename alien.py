@@ -10,7 +10,7 @@ class Alien(Sprite):
         self.settings=settings
 
         self.image=pygame.image.load('images/space_ship.bmp')
-        self.image=pygame.transform.scale(self.image,(80,80))
+        self.image=pygame.transform.scale(self.image,(75,75))
         self.rect=self.image.get_rect()
 
         self.rect.x=self.rect.width
