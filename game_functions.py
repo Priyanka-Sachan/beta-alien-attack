@@ -51,6 +51,22 @@ def fire_bullet(screen,settings,ship,bullets):
         new_bullet=Bullet(screen,settings,ship)
         bullets.add(new_bullet)
 
+def check_fleet_edges(settings,aliens):
+    for alien in aliens.sprites():
+        if alien.check_edges():
+            change_fleet_directions(settings,aliens)
+            break
+
+def change_fleet_directions(settings,aliens):
+    for alien in aliens.sprites():
+        alien.rect.y+=settings.fleet_drop_speed
+    settings.fleet_direction*=-1
+
+def update_aliens(settings,aliens):
+    check_fleet_edges(settings,aliens)
+    for alien in aliens:
+        alien.update()
+
 def get_number_aliens_x(settings,alien_width):
     available_space_x=settings.screen_width-2*alien_width
     number_aliens_x=int(available_space_x/(2*alien_width))
@@ -61,9 +77,10 @@ def get_number_aliens_y(settings,ship_height,alien_height):
     number_aliens_y=int(available_space_y/(2*alien_height))
     return number_aliens_y
 
-def creat_alien(screen,settings,aliens,alien_number_x,alien_number_y):
+def create_alien(screen,settings,aliens,alien_number_x,alien_number_y):
     alien=Alien(screen,settings)
     alien.rect.x=alien.rect.width+2*alien.rect.width*alien_number_x
+    alien.x=alien.rect.x
     alien.rect.y=alien.rect.height+2*alien.rect.height*alien_number_y
     aliens.add(alien)
 
@@ -73,4 +90,4 @@ def create_fleet(screen,settings,ship,aliens):
     number_aliens_y=get_number_aliens_y(settings,ship.rect.height,alien.rect.height)
     for alien_number_y in range(number_aliens_y):
         for alien_number_x in range(number_aliens_x):
-            creat_alien(screen,settings,aliens,alien_number_x,alien_number_y)
+            create_alien(screen,settings,aliens,alien_number_x,alien_number_y)
