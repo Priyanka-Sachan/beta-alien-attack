@@ -37,13 +37,14 @@ def check_play_button(screen,settings,stats,sb,play_button,ship,aliens,bullets,m
     if play_button.rect.collidepoint(mouse_x,mouse_y)and not stats.game_active:
         settings.initialize_dynamic_settings()
         stats.reset_stats()
-        stats.game_active=True
         sb.prep_score()
         sb.prep_high_score()
         sb.prep_level()
         sb.prep_ships()
         aliens.empty()
+        create_fleet(screen,settings,ship,aliens)
         bullets.empty()
+        stats.game_active=True
         pygame.mouse.set_visible(False)
 
 def update_screen(screen,settings,stats,sb,ship,aliens,bullets,play_button):
@@ -76,7 +77,7 @@ def check_alien_bullet_collision(screen,settings,stats,sb,ship,aliens,bullets):
             stats.score+=settings.alien_points
             sb.prep_score()
         check_high_score(stats,sb)
-    if len(aliens)==0:
+    if len(aliens)==0 and stats.game_active:
         bullets.empty()
         settings.increase_speed()
         stats.level+=1
@@ -99,6 +100,7 @@ def ship_hit(screen,settings,stats,sb,ship,aliens,bullets):
         ship.center_ship()
         sleep(0.5)
     else:
+        bullets.empty()
         stats.game_active=False
         pygame.mouse.set_visible(True)
 

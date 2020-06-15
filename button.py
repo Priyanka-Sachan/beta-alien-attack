@@ -13,6 +13,12 @@ class Button():
 
         self.rect=pygame.Rect(0,0,self.width,self.height)
         self.rect.center=self.screen_rect.center
+        self.rect.top+=200
+
+        self.image=pygame.image.load('images/alien.bmp')
+        self.image=pygame.transform.scale(self.image,(100,200))
+        self.image_rect=self.image.get_rect()
+        self.image_rect.center=self.screen_rect.center
 
         self.prep_msg(message)
 
@@ -20,7 +26,10 @@ class Button():
         self.msg_image=self.font.render(message,True,self.text_color,self.button_color)
         self.msg_image_rect=self.msg_image.get_rect()
         self.msg_image_rect.center=self.rect.center
+        self.image_rect.right=self.rect.left
+        self.image_rect.bottom=self.rect.bottom
         
     def draw_button(self):
         self.screen.fill(self.button_color,self.rect)
         self.screen.blit(self.msg_image,self.msg_image_rect)
+        self.screen.blit(self.image,self.image_rect)
