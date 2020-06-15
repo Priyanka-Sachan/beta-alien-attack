@@ -21,22 +21,29 @@ def check_keyup_events(event,ship):
     if event.key==pygame.K_LEFT:
         ship.moving_left=False
         
-def check_events(screen,settings,stats,play_button,ship,bullets):
+def check_events(screen,settings,stats,sb,play_button,ship,aliens,bullets):
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             sys.exit()
         elif event.type==pygame.MOUSEBUTTONDOWN:
             mouse_x,mouse_y=pygame.mouse.get_pos()
-            check_play_button(screen,settings,stats,play_button,mouse_x,mouse_y)
+            check_play_button(screen,settings,stats,sb,play_button,ship,aliens,bullets,mouse_x,mouse_y)
         elif event.type==pygame.KEYDOWN:
             check_keydown_events(event,screen,settings,ship,bullets)
         elif event.type==pygame.KEYUP:
             check_keyup_events(event,ship)
 
-def check_play_button(screen,settings,stats,play_button,mouse_x,mouse_y):
+def check_play_button(screen,settings,stats,sb,play_button,ship,aliens,bullets,mouse_x,mouse_y):
     if play_button.rect.collidepoint(mouse_x,mouse_y)and not stats.game_active:
         settings.initialize_dynamic_settings()
+        stats.reset_stats()
         stats.game_active=True
+        sb.prep_score()
+        sb.prep_high_score()
+        sb.prep_level()
+        sb.prep_ships()
+        aliens.empty()
+        bullets.empty()
         pygame.mouse.set_visible(False)
 
 def update_screen(screen,settings,stats,sb,ship,aliens,bullets,play_button):
@@ -68,9 +75,12 @@ def check_alien_bullet_collision(screen,settings,stats,sb,ship,aliens,bullets):
         for aliens in collisions.values():
             stats.score+=settings.alien_points
             sb.prep_score()
+        check_high_score(stats,sb)
     if len(aliens)==0:
         bullets.empty()
         settings.increase_speed()
+        stats.level+=1
+        sb.prep_level()
         create_fleet(screen,settings,ship,aliens)
 
 
@@ -79,9 +89,10 @@ def fire_bullet(screen,settings,ship,bullets):
         new_bullet=Bullet(screen,settings,ship)
         bullets.add(new_bullet)
 
-def ship_hit(screen,settings,stats,ship,aliens,bullets):
+def ship_hit(screen,settings,stats,sb,ship,aliens,bullets):
     if stats.ships_left>0:
         stats.ships_left-=1
+        sb.prep_ships()
         aliens.empty()
         bullets.empty()
         create_fleet(screen,settings,ship,aliens)
@@ -91,11 +102,11 @@ def ship_hit(screen,settings,stats,ship,aliens,bullets):
         stats.game_active=False
         pygame.mouse.set_visible(True)
 
-def check_alien_bottom(screen,settings,stats,ship,aliens,bullets):
+def check_alien_bottom(screen,settings,stats,sb,ship,aliens,bullets):
     screen_rect=screen.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom>=screen_rect.bottom:
-            ship_hit(screen,settings,stats,ship,aliens,bullets)
+            ship_hit(screen,settings,stats,sb,ship,aliens,bullets)
             break
 
 def check_fleet_edges(settings,aliens):
@@ -109,13 +120,13 @@ def change_fleet_directions(settings,aliens):
         alien.rect.y+=settings.fleet_drop_speed
     settings.fleet_direction*=-1
 
-def update_aliens(screen,settings,stats,ship,aliens,bullets):
+def update_aliens(screen,settings,stats,sb,ship,aliens,bullets):
     check_fleet_edges(settings,aliens)
     for alien in aliens:
         alien.update()
     if pygame.sprite.spritecollideany(ship,aliens):
-        ship_hit(screen,settings,stats,ship,aliens,bullets)
-    check_alien_bottom(screen,settings,stats,ship,aliens,bullets)
+        ship_hit(screen,settings,stats,sb,ship,aliens,bullets)
+    check_alien_bottom(screen,settings,stats,sb,ship,aliens,bullets)
 
 def get_number_aliens_x(settings,alien_width):
     available_space_x=settings.screen_width-2*alien_width
@@ -144,3 +155,8 @@ def create_fleet(screen,settings,ship,aliens):
     for alien_number_y in range(number_aliens_y):
         for alien_number_x in range(number_aliens_x):
             create_alien(screen,settings,aliens,alien_number_x,alien_number_y)
+
+def check_high_score(stats,sb):
+    if stats.score>stats.high_score:
+        stats.high_score=stats.score
+        sb.prep_high_score()
