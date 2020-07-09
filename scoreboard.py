@@ -24,7 +24,6 @@ class Scoreboard():
         rounded_score=int(round(self.stats.score,-1))
         score_str="{:,}".format(rounded_score)
         self.score_image=self.font.render("Score: "+score_str,True,self.text_color,self.settings.bg_color)
-
         self.score_rect=self.score_image.get_rect()
         self.score_rect.right=self.level_rect.left-200
         self.score_rect.top=20
